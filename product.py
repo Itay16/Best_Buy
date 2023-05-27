@@ -1,4 +1,8 @@
+import promotions
+
+
 class Product:
+    promotion = None
 
     def __init__(self, name, price, quantity, active=True):
         self.name = str(name)
@@ -29,16 +33,38 @@ class Product:
             self.active = False
 
     def show(self):
-        print(f"{self.name}, Price: {self.price}$, Quantity: {self.quantity}")
+        print(f"{self.name}, Price: {self.price}$, Quantity: {self.quantity}\nPromotion: {self.promotion}")
 
     def buy(self, quantity):
         if self.quantity >= quantity:
-            self.quantity -= quantity
-            total_price = self.price * quantity
-            return f"The total price is: {total_price}$"
-        elif self.quantity < quantity:
+            if self.promotion is not None:
+                discounted_price = promotions.Promotion.apply_promotion(self, quantity)
+                self.quantity -= quantity
+                return f"The total price with promotion applied is: {discounted_price}$"
+            else:
+                total_price = self.price * quantity
+                self.quantity -= quantity
+                return f"The total price is: {total_price}$"
+        else:
             print("There isn't enough of that product currently. Sorry!")
-            return
+
+    def set_promotion(self, promotion):
+        self.promotion = promotion
+
+    def get_promotion(self):
+        return self.promotion
+
+    def get_promotion_name(self):
+        if self.promotion:
+            return self.promotion.name
+        else:
+            return "None"
+
+    def apply_promotion(self, quantity):
+        if self.promotion:
+            return self.promotion.apply_promotion(self, quantity)
+        else:
+            return self.price * quantity
 
 
 class NonStockedProduct(Product):
