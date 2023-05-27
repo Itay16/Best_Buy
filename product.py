@@ -4,10 +4,10 @@ class Product:
         self.name = str(name)
         self.price = float(price)
         self.quantity = int(quantity)
-        self.active = active
-
-    def __str__(self):
-        return f"{self.name}, Price: {self.price}$, Quantity: {self.quantity}"
+        if self.quantity == 0:
+            self.active = False
+        else:
+            self.active = active
 
     def get_quantity(self):
         return self.quantity
@@ -25,6 +25,8 @@ class Product:
     def deactivate(self):
         if self.active:
             self.active = False
+        if self.quantity == 0:
+            self.active = False
 
     def show(self):
         print(f"{self.name}, Price: {self.price}$, Quantity: {self.quantity}")
@@ -34,5 +36,44 @@ class Product:
             self.quantity -= quantity
             total_price = self.price * quantity
             return f"The total price is: {total_price}$"
+        elif self.quantity < quantity:
+            print("There isn't enough of that product currently. Sorry!")
+            return
+
+
+class NonStockedProduct(Product):
+    def __init__(self, name, price, quantity=0, active=True):
+        super().__init__(name, price, quantity, active=True)
+
+    def show(self):
+        print(f"{self.name}, Price: {self.price}$\n"
+              f"This item is NOT physical.")
+
+    def buy(self, quantity):
+        return f"The total price is: {self.price}$"
+
+
+class LimitedProduct(Product):
+
+    def __init__(self, name, price, quantity, maximum=1, active=True):
+        self.name = name
+        self.price = price
+        self.quantity = quantity
+        self.maximum = maximum
+        self.active = active
+
+    def show(self):
+        print(f"{self.name}, Price: {self.price}$, Quantity: {self.quantity}"
+              f"This item is up for a limited time!")
+
+    def buy(self, quantity):
+        if quantity > 1:
+            print("We're sorry, you can only order this item once.")
         else:
-            return "There isn't enough of that product currently. Sorry!"
+            if self.quantity >= quantity:
+                self.quantity -= quantity
+                total_price = self.price * quantity
+                return f"The total price is: {total_price}$"
+            elif self.quantity < quantity:
+                print("There isn't enough of that product currently. Sorry!")
+                return
